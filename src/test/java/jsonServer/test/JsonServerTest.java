@@ -2,9 +2,8 @@ package jsonServer.test;
 
 import org.testng.annotations.Test;
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 
-public class JsonServerTest extends BaseJsonServerTest{
+public class JsonServerTest {
 
     @Test
     public void getPostTest(){
