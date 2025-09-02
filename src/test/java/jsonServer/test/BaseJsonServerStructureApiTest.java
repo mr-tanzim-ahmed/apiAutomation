@@ -7,6 +7,8 @@ import io.restassured.specification.RequestSpecification;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.restassured.RestAssured.given;
+
 public class BaseJsonServerStructureApiTest {
     private static final String BASE_URL = "http://localhost";
 
@@ -34,4 +36,15 @@ public class BaseJsonServerStructureApiTest {
         postJson.put("views",views);
         return postJson;
     }
+    public String getPostId(){
+        return given()
+                .spec(requestSpecification())
+                .log().uri()
+                .when()
+                .get("/posts/")
+                .then()
+                .statusCode(200)
+                .extract().jsonPath().getString("[0].id");
+    }
+
 }
