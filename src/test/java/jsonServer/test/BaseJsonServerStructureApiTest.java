@@ -2,11 +2,14 @@ package jsonServer.test;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 
 public class BaseJsonServerStructureApiTest {
@@ -45,6 +48,23 @@ public class BaseJsonServerStructureApiTest {
                 .then()
                 .statusCode(200)
                 .extract().jsonPath().getString("[0].id");
+    }
+    public String getPostTitle(){
+        Response response =  given()
+                .spec(requestSpecification())
+                .when()
+                .get("/posts/"+getPostId());
+        return response.jsonPath().getString("title");
+
+    }
+
+    public int getPostViews(){
+        Response response = given()
+                .spec(requestSpecification())
+                .when()
+                .get("/posts/"+getPostId());
+        JsonPath jsonPath = response.jsonPath();
+        return jsonPath.getInt("views");
     }
 
 }
