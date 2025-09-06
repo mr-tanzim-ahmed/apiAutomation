@@ -8,8 +8,7 @@ import org.testng.annotations.Test;
 import java.util.Random;
 
 import static io.restassured.RestAssured.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 
 public class JsonServerStructureApiTest extends BaseJsonServerStructureApiTest {
@@ -28,14 +27,8 @@ public class JsonServerStructureApiTest extends BaseJsonServerStructureApiTest {
     }
     @Test
     public void detailPostShouldSucceed(){
-        Response response = given()
-                .spec(requestSpecification())
-                .when()
-                .get("/posts/"+getPostId());
-        JsonPath jsonPath = response.jsonPath();
-        String title = jsonPath.getString("title");
-        System.out.println(title);
-        int views = jsonPath.getInt("views");
+        String title = getPostTitle();
+        int views = getPostViews();
 
         given()
                 .spec(requestSpecification())
@@ -52,12 +45,13 @@ public class JsonServerStructureApiTest extends BaseJsonServerStructureApiTest {
     }
     @Test
     public void detailPostWithInvalidIdShouldFail(){
+        String id = "df321ds";
         given()
                 .spec(requestSpecification())
                 .log().uri()
                 .log().body()
                 .when()
-                .get("/posts/df321ds")
+                .get("/posts/"+id)
                 .then()
                 .statusCode(404)
                 .log().body();
@@ -124,6 +118,7 @@ public class JsonServerStructureApiTest extends BaseJsonServerStructureApiTest {
                 .delete("/posts/"+getPostId())
                 .then()
                 .statusCode(200)
+                .body("id",equalTo(getPostId()))
                 .log().body();
     }
     @Test

@@ -39,6 +39,7 @@ public class BaseJsonServerStructureApiTest {
         postJson.put("views",views);
         return postJson;
     }
+    //get -> get request
     public String getPostId(){
         return given()
                 .spec(requestSpecification())
