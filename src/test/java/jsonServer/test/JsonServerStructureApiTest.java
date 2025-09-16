@@ -1,12 +1,8 @@
 package jsonServer.test;
 
 import com.thedeanda.lorem.LoremIpsum;
-import io.restassured.path.json.JsonPath;
-import io.restassured.response.Response;
 import org.testng.annotations.Test;
-
 import java.util.Random;
-
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 

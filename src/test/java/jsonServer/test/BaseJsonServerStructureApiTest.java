@@ -34,6 +34,7 @@ public class BaseJsonServerStructureApiTest {
                 "title",title
         );
     }
+    //Alternative way
     public Map<String, Object> getPostJson(int views){
         Map<String, Object> postJson = new HashMap<>();
         postJson.put("views",views);
