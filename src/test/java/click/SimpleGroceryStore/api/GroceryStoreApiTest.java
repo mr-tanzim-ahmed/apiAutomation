@@ -3,90 +3,65 @@ package click.SimpleGroceryStore.api;
 import com.thedeanda.lorem.LoremIpsum;
 import org.testng.annotations.Test;
 
-import java.util.Map;
-import java.util.Objects;
-
-import static org.hamcrest.Matchers.*;
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
-public class GroceryStoreApiTest extends BaseGroceryStoreApiTest{
+public class GroceryStoreApiTest extends BaseGroceryStoreApiTest {
 
     @Test
-    public void getProductsShouldSucceed(){
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .when()
-                .get("/products")
+    public void getProductsShouldSucceed() {
+        groceryStoreApi.getProducts()
                 .then()
                 .statusCode(200);
     }
-    @Test public void getProductDetailShouldSucceed(){
-        int productId = getProductId();
 
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .when()
-                .get("/products/"+productId)
+    @Test
+    public void getProductDetailShouldSucceed() {
+        int productId = groceryStoreApi.getFirstProductId();
+
+        groceryStoreApi.getProduct(productId)
                 .then()
                 .statusCode(200)
                 .log().body()
                 .body("id",equalTo(productId));
     }
+
     @Test
-    public void getProductDetailShouldFail(){
-        long productId = 123213; //Random
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .when()
-                .get("/products/"+productId)
+    public void getProductDetailShouldFail() {
+        int productId = 123213;
+        groceryStoreApi.getProduct(productId)
                 .then()
                 .statusCode(404)
                 .body("error",equalTo("No product with id 123213."))
                 .log().body();
     }
-    @Test public void createCartShouldSucceed(){
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .when()
-                .post("/carts")
+
+    @Test
+    public void createCartShouldSucceed() {
+        groceryStoreApi.createCart()
                 .then()
                 .statusCode(201)
                 .body("created",equalTo(true))
                 .log().body();
     }
+
     @Test
-    public void getCartShouldSucceed(){
-        String cartId = getCartId();
+    public void getCartShouldSucceed() {
+        String cartId = groceryStoreApi.createCartAndGetId();
         System.out.println("CartID:  "+cartId);
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .when()
-                .get("/carts/"+cartId)
+        groceryStoreApi.getCart(cartId)
                 .then()
                 .statusCode(200)
                 .log().body();
     }
 
     @Test
-    public void addItemToCartShouldSucceed(){
+    public void addItemToCartShouldSucceed() {
         int quantity = 2;
-        String cartId = getCartId();
-        int productId = getProductId();
+        String cartId = groceryStoreApi.createCartAndGetId();
+        int productId = groceryStoreApi.getFirstProductId();
         System.out.println("ProductID:  "+productId);
-        Map<String, Integer> productJson = getProductJson(productId, quantity);
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .log().body()
-                .body(productJson)
-                .when()
-                .post("/carts/"+cartId+"/items")
+        groceryStoreApi.addItemToCart(cartId, productId, quantity)
                 .then()
                 .log().body()
                 .statusCode(201)
@@ -94,61 +69,36 @@ public class GroceryStoreApiTest extends BaseGroceryStoreApiTest{
                         "itemId", notNullValue());
     }
 
-
     @Test
-    public void createOrderShouldSucceed(){
-        String cartId = getCartId();
+    public void createOrderShouldSucceed() {
+        String cartId = groceryStoreApi.createCartAndGetId();
 
-        //Create product list>> Add to cart >> then order
         int quantity = 2;
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .log().body()
-                .body(getProductJson(getProductId(),quantity))
-                .when()
-                .post("/carts/"+cartId+"/items")
+        groceryStoreApi.addItemToCart(cartId, groceryStoreApi.getFirstProductId(), quantity)
                 .then()
                 .log().body()
                 .statusCode(201);
 
         String customerName = LoremIpsum.getInstance().getName();
         String comment = LoremIpsum.getInstance().getTitle(5);
-        Map<String, Object> orderJson = getNewOrderJson(cartId,customerName,comment);
 
-        given()
-                .spec(requestSpecForPrivateApi())
-                .body(orderJson)
-                .when()
-                .post("/orders")
+        groceryStoreApi.createOrder(cartId, customerName, comment)
                 .then()
                 .statusCode(201)
                 .log().body()
                 .body("created",equalTo(true),
-                        "orderId", notNullValue()
-                );
+                        "orderId", notNullValue());
     }
 
     @Test
-    public void registerNewApiClientShouldSucceed(){
+    public void registerNewApiClientShouldSucceed() {
         String name = LoremIpsum.getInstance().getName();
         String email = LoremIpsum.getInstance().getEmail();
-        //Receiving registered bearer token
-        Map<String, String>clientJson = getApiClientsJson(name,email);
 
-        given()
-                .spec(requestSpecForPublicApi())
-                .log().uri()
-                .log().body()
-                .body(clientJson)
-                .when()
-                .post("/api-clients")
+        groceryStoreApi.registerApiClient(name, email)
                 .then()
                 .statusCode(201)
                 .body("accessToken", notNullValue())
                 .log().body();
-
     }
-
-
 }

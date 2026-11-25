@@ -5,6 +5,8 @@ A Java and Gradle project containing API integration tests written with TestNG a
 - **Simple Grocery Store API** (`https://simple-grocery-store-api.click`): product, cart, API-client registration, and order endpoints.
 - **JSON Server** (`http://localhost:3000`): CRUD operations for `/posts`.
 
+Each API has a page object that encapsulates its request specifications and endpoint calls. Test classes use these objects and keep response assertions in the tests.
+
 ## Requirements
 
 - JDK 11 or later
